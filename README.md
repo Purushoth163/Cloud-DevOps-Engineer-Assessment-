@@ -19,8 +19,8 @@
 2. Build and push the Docker image:
    ```bash
    cd app
-   docker build -t <your-dockerhub-username>/web-app:latest .
-   docker push <your-dockerhub-username>/web-app:latest
+   docker build -t <dockerhub-username>/web-app:latest .
+   docker push <dockerhub-username>/web-app:latest
    ```
 
 3. Deploy the Kubernetes manifests:
