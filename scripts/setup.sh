@@ -7,7 +7,7 @@ terraform apply -auto-approve
 
 # Build and push Docker image
 cd ../app
-docker build -t <dockerhub-username>/web-app:latest .
+docker build -t <dockerhub-username>/web-app:latest . 
 docker push <dockerhub-username>/web-app:latest
 
 # Apply Kubernetes manifests
