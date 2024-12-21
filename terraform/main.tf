@@ -20,16 +20,54 @@ module "eks" {
   cluster_name    = "k8s-cluster"
   cluster_version = "1.26"
 
-  subnets         = module.vpc.private_subnets
+  subnet_ids         = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
 
-  node_groups = {
+    eks_managed_node_groups = {
     eks_nodes = {
-      desired_capacity = 2
-      max_capacity     = 3
-      min_capacity     = 1
+      ami_type       = "AL2023_x86_64_STANDARD"
+      instance_types = ["m5.xlarge"]
 
-      instance_type = "t3.medium"
+      min_size     = 2
+      max_size     = 10
+      desired_size = 2
     }
   }
+}
+
+resource "aws_security_group" "alb_sg" {
+  name        = "alb-security-group"
+  description = "Allow HTTP and HTTPS traffic"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_lb" "app_alb" {
+  name               = "app-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = module.vpc.public_subnets
+
+  enable_deletion_protection = false
 }
